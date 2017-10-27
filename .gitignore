@@ -38,6 +38,8 @@ $RECYCLE.BIN/
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
+.dashuploader-win32-x64
+.node_modules
 
 # Directories potentially created on remote AFP share
 .AppleDB
