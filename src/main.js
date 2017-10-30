@@ -6,10 +6,30 @@ const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
+var {ipcMain} = electron; 
+
+const { createLogger, format, transports } = require('winston');
+
+const logger = createLogger({
+  level: 'info',
+  format: format.json(),
+  transports: [
+    //
+    // - Write to all logs with level `info` and below to `combined.log` 
+    // - Write all logs error (and below) to `error.log`.
+    //
+	new transports.Console(),
+	new transports.File({ filename: './logs/debug.log', level: 'debug' }),
+    new transports.File({ filename: './logs/error.log', level: 'error' }),
+    new transports.File({ filename: './logs/combined.log' })
+  ]
+});
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let deviceSelectWindow
 
 function createWindow () {
   // Create the browser window.
@@ -25,7 +45,7 @@ function createWindow () {
   mainWindow.setResizable(false);
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -36,6 +56,39 @@ function createWindow () {
   })
 
 }
+
+function createSelectDeviceWindow(devices) {
+  // Create the browser window.
+  deviceSelectWindow = new BrowserWindow({width: 400, height: 800, frame: false, parent: mainWindow, modal: true})
+
+  // and load the index.html of the app.
+  deviceSelectWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'deviceSelect.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+  
+  deviceSelectWindow.webContents.on('did-finish-load', () => {
+    logger.log("debug", "windows finsihed loading..sending info now");
+	deviceSelectWindow.webContents.send('devices_list', devices)
+  })
+  
+  deviceSelectWindow.setResizable(false);
+
+  // Open the DevTools.
+  //deviceSelectWindow.webContents.openDevTools()
+
+  // Emitted when the window is closed.
+  deviceSelectWindow.on('closed', function () {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    mainWindow = null
+  })
+   
+  deviceSelectWindow.show()
+}
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -61,3 +114,16 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+// Listen for async message from renderer process
+ipcMain.on('async', (event, arg) => {  
+    // Print 1
+    console.log("Got async message", arg);
+    // Reply on async message from renderer process
+    //event.sender.send('async-reply', 2);
+});
+
+ipcMain.on('select_devices', (event, arg) => {  
+  logger.log('info', "Launch select devices window" + JSON.stringify(arg));
+  createSelectDeviceWindow(arg);
+  
+});

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Photon</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="./css/theme.css">
+	<link rel="stylesheet" href="http://icono-49d6.kxcdn.com/icono.min.css">
+  
+  </head>
+  <body>
+    <div id="header_wrapper">
+		<div class="div_logo"></div>
+		<div><h2>Select Devices</h2></div>
+		<div id="div_reset" class="icono-reset"></div>
+		<div class="box box3" id = "div_app_close">
+			<svg viewbox="0 0 40 40">
+			<path class="close-x" d="M 10,10 L 30,30 M 30,10 L 10,30" />
+			</svg>
+		</div>
+	</div>
+		
+	<div id="div_device_list">
+		<p>192.168.1.0</p>
+	</div>
+	
+	<input type="button" id="my_input_submit" value="Done">
+	
+	<script>
+      // You can also require other files to run in this process
+      require('./deviceSelectRenderer.js')
+	</script>
+  </body>
+</html>
