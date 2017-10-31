@@ -67,6 +67,7 @@ brw.on('update', function (data) {
 }); 
  
 $("#ota_fw_file").click(function(){
+	logger.log("info", "os environment is :: " + process.platform);
 	if(selectedDevices.length <= 0) return;
 	dialog.showOpenDialog((fileNames) => {
     // fileNames is an array that contains all the selected
@@ -102,7 +103,7 @@ $('#ota_upload').click(function(){
   if(selectedDevices.length <= 0) return;
   selectedDevices.forEach(function(device, index){
 	logger.log("info", "Starting upload to device :: " + devices[device].ip)
-	var otaCmd = '"' + app.getAppPath()+'\\tools\\upload_ota.exe" -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
+	var otaCmd = generateOTACmd(device);	
 	cmd.get(
 		otaCmd,
 		function(err, data, stderr){
@@ -207,5 +208,15 @@ function enableUploadButton(file){
 			$(this).css("background-color", "#1C2541");
 		});
 	}
+}
+
+function generateOTACmd(device){
+	var otaCmd = ""
+	if(process.platform == "win32"){
+		otaCmd= '"' + app.getAppPath()+'\\tools' + "\\" + process.platform +'\\upload_ota.exe" -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
+	}else if(process.platform == "linux"){
+		var otaCmd = '"' + app.getAppPath()+'\\tools' + "\\" + process.platform +'\\upload_ota_linux" -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
+	}
+	return otaCmd;
 }
 	
