@@ -39,6 +39,7 @@ $RECYCLE.BIN/
 .Trashes
 .VolumeIcon.icns
 .dashuploader-win32-x64
+.DashUploader-linux-x64
 .node_modules
 
 # Directories potentially created on remote AFP share
@@ -49,3 +50,4 @@ Temporary Items
 .apdisk
 *.log
 src/logs/combined.log
+DashUploader-linux-x64
