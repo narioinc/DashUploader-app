@@ -45,13 +45,14 @@ function createWindow () {
   mainWindow.setResizable(false);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
+	logger.log('debug', "App was closed");
     mainWindow = null
   })
 
@@ -83,7 +84,7 @@ function createSelectDeviceWindow(devices) {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null
+    deviceSelectWindow = null;
   })
    
   deviceSelectWindow.show()
@@ -126,4 +127,10 @@ ipcMain.on('select_devices', (event, arg) => {
   logger.log('info', "Launch select devices window" + JSON.stringify(arg));
   createSelectDeviceWindow(arg);
   
+});
+
+ipcMain.on('accept_selection', (event, arg) => {
+	logger.log('info', arg.length + " device(s) ready for firmware upload procedure.");
+	deviceSelectWindow.close();
+	mainWindow.webContents.send("devices_selected", arg);	
 });

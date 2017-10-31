@@ -6,10 +6,12 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="./css/theme.css">
 	<link rel="stylesheet" href="http://icono-49d6.kxcdn.com/icono.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/photon.min.css">
   
   </head>
-  <body>
-    <div id="header_wrapper">
+  <body class="body_device_screen">
+    <div class="window">
+	<div id="header_wrapper">
 		<div class="div_logo"></div>
 		<div><h2>Select Devices</h2></div>
 		<div id="div_reset" class="icono-reset"></div>
@@ -18,17 +20,30 @@
 			<path class="close-x" d="M 10,10 L 30,30 M 30,10 L 10,30" />
 			</svg>
 		</div>
-	</div>
-		
-	<div id="div_device_list">
-		<p>192.168.1.0</p>
+	</div>	
+	
+	<div class="device_list_container">
+	<ul class="list-group">
+		<li class="list-group-item">
+			<span class="icon icon-monitor"></span>
+			<div class="media-body">
+				<strong>List item title</strong>
+				<p>Lorem ipsum dolor sit amet.</p>
+			</div>
+		</li>
+	</ul>
 	</div>
 	
-	<input type="button" id="my_input_submit" value="Done">
+	<div class="selection_options">
+		<p id="accept_selection"><span class="icon icon-check" ></span></p>
+		<p id="reset_selection"><span class="icon icon-cancel" ></span></p>
+	</div>
+    </div>
 	
 	<script>
       // You can also require other files to run in this process
       require('./deviceSelectRenderer.js')
 	</script>
-  </body>
+
+</body>
 </html>

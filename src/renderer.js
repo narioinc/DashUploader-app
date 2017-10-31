@@ -30,7 +30,7 @@ var dialog = remote.dialog;
 var filepath; 
 var ip, port; 
 var devices = [];
-devices.push({ip: "192.168.1.7", port: "5000"});
+var selectedDevices = [];
 
 $('#div_app_close').click(function(){
 	 var window = remote.getCurrentWindow();
@@ -52,7 +52,7 @@ brw.on('update', function (data) {
 		device.ip = ip;
 		device.port = port;
 		logger.log('debug', 'ip :: ' + device.ip + " port :: " + device.port);
-		message = getDeviceFoundMessage(devices.length);		
+		message = "<p>Found "+ devices.length +" Dash Button(s)</p> <p> - </p> <p> Click Here to Select</p>"		
 		$("#div_ameba_device").html(message);
 		$("#div_ameba_device > p").css({"top": "30%", "font-size": "12px"});
 		checkDeviceAndAdd(device);
@@ -61,15 +61,16 @@ brw.on('update', function (data) {
 }); 
  
 $("#ota_fw_file").click(function(){
+	if(selectedDevices.length <= 0) return;
 	dialog.showOpenDialog((fileNames) => {
     // fileNames is an array that contains all the selected
-    if(fileNames === undefined){
+	if(fileNames === undefined){
         logger.log('info', "No file selected");
         return;
     }else{
 		filepath = fileNames[0];
 		$("#ota_fw_file").html("F/W Selected !").css({"color": "green"});
-		
+		logger.log('debug', "File path selected :: " + filepath);
 		fs.readFile(filepath, 'utf-8', (err, data) => {
         if(err){
             logger.log('error', "An error ocurred reading the file :" + err.message);
@@ -78,15 +79,20 @@ $("#ota_fw_file").click(function(){
 
         // Change how to handle the file content
         logger.log('debug', "The file content is : " + data);
+		enableUploadButton(filepath);
     });
 	}
 });
+
 })
 
 $('#ota_upload').click(function(){
-  $("#ota_upload").html("Uploading..")
-  devices.forEach(function(device, index){
-	var otaCmd = '.\\tools\\upload_ota.exe -f "' + filepath + '" -i ' + device.ip + ' -p ' + device.port;
+  $("#ota_upload").html('<p>No Device Found<p><div class="loader-line"></div>')
+  var uploadSuccess = true;
+  if(selectedDevices.length <= 0) return;
+  selectedDevices.forEach(function(device, index){
+	logger.log("info", "Starting upload to device :: " + devices[device].ip)  
+	var otaCmd = '.\\tools\\upload_ota.exe -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
 	cmd.get(
 		otaCmd,
 		function(err, data, stderr){
@@ -95,9 +101,13 @@ $('#ota_upload').click(function(){
 			logger.log('error', 'error is any: ', err);
 			if(data.includes("Upload success")){
 				$("#ota_upload").html("OTA Success!!!").css({"color": "green"})
+				logger.info('info', "Upload success for device :: " + devices[device].ip );
+				uploadSuccess &= true;
 			}else{
 				$("#ota_upload").html("OTA Failed.").css({"color": "red"})
-				logger.info('info', "OTA Upload failed for :: " + device.ip);
+				dialog.showMessageBox({type:"error", message:"Some devices failed to get updated. Check the combined.logs in \logs folder for details"});
+				logger.info('info', "OTA Upload failed for :: " +  devices[device].ip );
+				uploadSuccess &= false;
 			}
     });
   });
@@ -122,7 +132,7 @@ $('#ota_upload').click(function(){
 
 function getDeviceFoundMessage(){
 	if(devices.length > 1){
-		return "<p>Found Dash Buttons</p> <p> - </p> <p> Click Here to Select</p>"
+		return "<p>Found  "+ devices.length +" Dash Buttons</p> <p> - </p> <p> Click Here to Select</p>"
 	}else{
 		return "<p>Found Dash Button</p> <p> @ </p> <p> " + ip + ":" + port + "</p>"
 	}
@@ -134,3 +144,39 @@ $("#div_ameba_device").click(function(){
 		ipcRenderer.send("select_devices", devices);
 	}
 });
+
+ipcRenderer.on('devices_selected', function(event, args){
+	if(args.length >= 1){
+		logger.log('info', "Number of device ready for new firmware provisioning :: " + args.length);
+		selectedDevices = args;
+	}else{
+		logger.debug("USer did not select any devices for new firmware.")
+		selectedDevices = [];
+	}
+	enableBrowseButton();
+});
+
+function enableBrowseButton(){
+	if(selectedDevices.length >= 1 ){
+		$("#div_file_select").hover(function(e){
+			$(this).css("background-color", e.type === "mouseenter"?"#2374AB":"#1C2541");
+		});
+	}else{
+		$("#div_file_select").hover(function(){
+			$(this).css("background-color", "#1C2541");
+		});
+	}
+}
+
+function enableUploadButton(file){
+	if(selectedDevices.length >=1 && file && file.length > 0){
+		$("#div_ota_upload").hover(function(e){
+			$(this).css("background-color", e.type === "mouseenter"?"#2374AB":"#1C2541");
+		});
+	}else{
+		$("#div_ota_upload").hover(function(){
+			$(this).css("background-color", "#1C2541");
+		});
+	}
+}
+	

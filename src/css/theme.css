@@ -4,10 +4,9 @@
 }
 
 body {
+	background-color: #5BC0BE;
 	color: #fff;
-    background-color: #5BC0BE;
-	font-family: "Noto Sans", serif;
-	-webkit-app-region: drag; 
+    font-family: "Noto Sans", serif;
 	-webkit-user-select: none;
 	overflow: hidden;
 }
@@ -40,6 +39,14 @@ margin: 0;
 padding: 0;
 }
 
+
+#header_wrapper{
+	-webkit-app-region: drag;
+	height: 20%;
+	background-color: #5BC0BE;
+	color: #fff;
+}
+
 #steps_wrapper{
 display: flex;
 flex-wrap: wrap;
@@ -55,7 +62,7 @@ padding: 10px 10px 0 0;
 	height: 90px;
 }
 
-#steps_wrapper > div:hover { background-color: #2374AB; }
+#div_ameba_device:hover { background-color: #2374AB; }
 
 #steps_wrapper > div > p{
 	margin: 0;
@@ -175,7 +182,7 @@ button {
 #div_device_list {
 	background-color: #fff;
 	width: 100%;
-	height: 90%;
+	height: 95%;
 }
 
 #devices_list{
@@ -189,4 +196,54 @@ button {
 	margin-left: 0px;
 	margin-right: 0px;
 	background-color: #fff;
+}
+
+.device_list_container{
+	height: 90%;
+	overflow-y: scroll;
+}
+
+.body_device_screen{
+  margin:0px;
+  padding:0px;
+  font-family: "Noto Sans", serif;
+}
+
+.selection_options{
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+	background-color: #5BC0BE;
+}
+
+.icon {
+	font-size: 35px;
+}
+
+.selection_options .icon {
+	font-size: 35px;
+	color: #fff;
+}
+
+#accept_selection{
+	float: right;
+	margin-top: -4px;
+	margin-right: 10px;	
+}
+
+#reset_selection{
+	float: left;
+	margin-top: -4px;
+	margin-left: 10px;	
+}
+
+.list-group-item-selected {
+	color: #fff;
+	background-color: #0B132B;
+}
+
+.list-group-item-selected div {
+	color: #fff;
 }
