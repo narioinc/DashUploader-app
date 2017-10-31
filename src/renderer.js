@@ -87,7 +87,7 @@ $("#ota_fw_file").click(function(){
 })
 
 $('#ota_upload').click(function(){
-  $("#ota_upload").html('<p>No Device Found<p><div class="loader-line"></div>')
+  $("#ota_upload").html('<p>Uploading...<p>')
   var uploadSuccess = true;
   if(selectedDevices.length <= 0) return;
   selectedDevices.forEach(function(device, index){
