@@ -4,6 +4,8 @@
 var mdns = require('mdns-js');
 var cmd = require('node-cmd');
 const remote = require('electron').remote;
+const app = require('electron').remote.app; 
+
 window.$ = window.jQuery = require("jquery");
 const { createLogger, format, transports } = require('winston');
 
@@ -16,9 +18,9 @@ const logger = createLogger({
     // - Write all logs error (and below) to `error.log`.
     //
 	new transports.Console(),
-	new transports.File({ filename: './logs/debug.log', level: 'debug' }),
-    new transports.File({ filename: './logs/error.log', level: 'error' }),
-    new transports.File({ filename: './logs/combined.log' })
+	new transports.File({ filename: app.getAppPath()+'/logs/debug.log', level: 'debug' }),
+    new transports.File({ filename: app.getAppPath()+'/logs/error.log', level: 'error' }),
+    new transports.File({ filename: app.getAppPath()+'/logs/combined.log' })
   ]
 });
 
@@ -31,6 +33,10 @@ var filepath;
 var ip, port; 
 var devices = [];
 var selectedDevices = [];
+var uploadProgress = 0;
+var uploadSuccess = true;
+
+//devices.push({ip: "192.168.1.101", port: "5000"});
 
 $('#div_app_close').click(function(){
 	 var window = remote.getCurrentWindow();
@@ -78,7 +84,7 @@ $("#ota_fw_file").click(function(){
         }
 
         // Change how to handle the file content
-        logger.log('debug', "The file content is : " + data);
+        //logger.log('debug', "The file content is : " + data);
 		enableUploadButton(filepath);
     });
 	}
@@ -87,12 +93,16 @@ $("#ota_fw_file").click(function(){
 })
 
 $('#ota_upload').click(function(){
-  $("#ota_upload").html('<p>Uploading...<p>')
-  var uploadSuccess = true;
+  if(!uploadSuccess){
+	dialog.showMessageBox({type:"error", message:"Some devices failed to get updated. Check the combined.logs in resources\app\logs folder for details"});
+	return;
+  }
+  
+  $("#ota_upload").html('Uploading...')
   if(selectedDevices.length <= 0) return;
   selectedDevices.forEach(function(device, index){
-	logger.log("info", "Starting upload to device :: " + devices[device].ip)  
-	var otaCmd = '.\\tools\\upload_ota.exe -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
+	logger.log("info", "Starting upload to device :: " + devices[device].ip)
+	var otaCmd = '"' + app.getAppPath()+'\\tools\\upload_ota.exe" -f "' + filepath + '" -i ' + devices[device].ip + ' -p ' + devices[device].port;
 	cmd.get(
 		otaCmd,
 		function(err, data, stderr){
@@ -100,15 +110,16 @@ $('#ota_upload').click(function(){
 			logger.log('info', 'the current working dir content is : ', data)
 			logger.log('error', 'error is any: ', err);
 			if(data.includes("Upload success")){
-				$("#ota_upload").html("OTA Success!!!").css({"color": "green"})
+				//$("#ota_upload").html(uploadMessage).css({"color": "green"})
 				logger.info('info', "Upload success for device :: " + devices[device].ip );
 				uploadSuccess &= true;
 			}else{
-				$("#ota_upload").html("OTA Failed.").css({"color": "red"})
-				dialog.showMessageBox({type:"error", message:"Some devices failed to get updated. Check the combined.logs in \logs folder for details"});
+				//$("#ota_upload").html(uploadMessage).css({"color": "red"})		
 				logger.info('info', "OTA Upload failed for :: " +  devices[device].ip );
 				uploadSuccess &= false;
 			}
+			uploadProgress++;
+			remote.getCurrentWindow().webContents.send("uploadProgress");
     });
   });
 });
@@ -117,6 +128,12 @@ $('#ota_upload').click(function(){
 	logger.info('info', "User selected to reset main UI.")
 	ip = "";
 	port = "";
+	uploadSuccess = true;
+	uploadProgress = 0;
+	filepath="";
+	selectedDevices = [];
+	enableUploadButton("");
+	enableBrowseButton();
 	$("#ota_upload").html("Upload").css({"color": "white"});
 	$("#ota_fw_file").html("Browse..").css({"color": "white"});
 	$("#div_ameba_device").html('<p>No Device Found<p>	<div class="loader-line"></div>');
@@ -139,6 +156,7 @@ function getDeviceFoundMessage(){
 }
 	
 $("#div_ameba_device").click(function(){
+	logger.log("info", app.getAppPath() + " is the app path");
 	if(devices.length >= 1){
 		logger.log('info', "User requests device selection window");
 		ipcRenderer.send("select_devices", devices);
@@ -154,6 +172,17 @@ ipcRenderer.on('devices_selected', function(event, args){
 		selectedDevices = [];
 	}
 	enableBrowseButton();
+});
+
+ipcRenderer.on('uploadProgress', function(event, args){
+	logger.log("info", "got progress update");
+	if(uploadProgress==selectedDevices.length){
+		if(uploadSuccess){
+			$("#ota_upload").html("OTA success!!").css({"color": "green"})
+		}else{
+			$("#ota_upload").html("OTA has failures").css({"color": "red"})
+		}
+	}
 });
 
 function enableBrowseButton(){
