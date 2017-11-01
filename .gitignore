@@ -51,3 +51,5 @@ Temporary Items
 *.log
 src/logs/combined.log
 DashUploader-linux-x64
+DashUploader-win32-x64
+dashuploader-win32-x64
