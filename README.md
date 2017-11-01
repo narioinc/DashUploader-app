@@ -20,17 +20,20 @@ npm install
 npm start
 ```
 # Beta v1.1
-Beta version v1.1 includes the following changes
-* enable/disables the various button based on previous steps success
+Beta version v1.1 includes the following changes:
+* support for linux x64 architecture
+* enable/disable the various button based on previous steps status
 * multi device support
 * selection screen for devices
-* minor ui tweaks for the three main screen button
+* minor ui tweaks for the three main-screen buttons
 * upload functionality change now to incorporate upload to multiple
+* bug fixes from v1.0
+
 
 # Beta v1.0
-Initial release of the Dash uploader app
-1) Electronjs based app for uploading ota firmware to Ameba IoT devices
-2) Supports upload to single device
+Initial release of the DashUploader app:
+* Electronjs based app for uploading ota firmware to Ameba IoT devices
+* Supports upload to single device
 
 # Buy the boards:
 * Creator pro: https://pt.aliexpress.com/store/product/CREATOR-Ameba-RTL8711AM-WiFi-Board-Support-the-Arduino-IDE-64M-Flash-2M-SDRAM-Compatible-with-Arduino/2805180_32807149042.html
