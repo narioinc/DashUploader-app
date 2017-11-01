@@ -31,3 +31,7 @@ Beta version v1.1 includes the following changes
 Initial release of the Dash uploader app
 1) Electronjs based app for uploading ota firmware to Ameba IoT devices
 2) Supports upload to single device
+
+# Buy the boards:
+Creator pro: https://pt.aliexpress.com/store/product/CREATOR-Ameba-RTL8711AM-WiFi-Board-Support-the-Arduino-IDE-64M-Flash-2M-SDRAM-Compatible-with-Arduino/2805180_32807149042.html
+Dash Button: https://pt.aliexpress.com/wholesale?spm=a2g03.search0104.8.34.BHUDrL&initiative_id=QRW_20171031235542&SearchText=tra%C3%A7o+bot%C3%A3o&productId=32814812323
