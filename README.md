@@ -7,11 +7,15 @@ Make sure your Ameba board is flashed with the sample arduino app that is shared
 Follow the detailed tutorial here:
 https://www.hackster.io/naresh-krish/push-ota-updates-to-your-rak-wireless-ameba-devices-fad3fd
 
-#Usage from source code
-Usage from the source code is fairly straight forward:
+# Usage from source code
+Usage from the source code is fairly straight forward. From the root of the src folder:
 
-##Install all the dependencies
+## Install all the dependencies
+```javascript 
 npm install
+```
 
-##start the application
+## Start the application
+```javascript 
 npm start
+```
