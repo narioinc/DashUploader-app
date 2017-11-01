@@ -19,3 +19,15 @@ npm install
 ```javascript 
 npm start
 ```
+# Beta v1.1
+Beta version v1.1 includes the following changes
+* enable/disables the various button based on previous steps success
+* multi device support
+* selection screen for devices
+* minor ui tweaks for the three main screen button
+* upload functionality change now to incorporate upload to multiple
+
+# Beta v1.0
+Initial release of the Dash uploader app
+1) Electronjs based app for uploading ota firmware to Ameba IoT devices
+2) Supports upload to single device
