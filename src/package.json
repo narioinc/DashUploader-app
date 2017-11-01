@@ -1,20 +1,20 @@
 {
   "name": "electron-quick-start",
   "version": "1.1.1",
-  "description": "A minimal Electron application",
+  "description": "A Electron app for uploading firmware to Ameba IoT devices",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/narioinc/DashUploader-app.git",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "RAK Wireless",
+    "Creator pro",
+    "Ameba IoT",
+    "Ameba Arduino",
+    "Dash button"
   ],
-  "author": "GitHub",
+  "author": "Naresh krish",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.7.8"
