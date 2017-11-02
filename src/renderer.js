@@ -65,6 +65,7 @@ brw.on('ready', function() {
   brw.discover();
 });
 brw.on('update', function(data) {
+  logger.log('info', JSON.stringify(data));
   if (data.host == "ameba.local") {
     var device = {};
     ip = data.addresses[0];
