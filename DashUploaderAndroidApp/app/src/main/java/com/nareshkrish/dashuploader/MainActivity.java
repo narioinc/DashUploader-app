@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.crashlytics.android.Crashlytics;
 import com.nareshkrish.adapters.DeviceListAdapter;
 import com.nareshkrish.ameba.AmebaDevice;
 
+import io.fabric.sdk.android.Fabric;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         mBtnScanDevices = findViewById(R.id.main_btnDeviceScan);

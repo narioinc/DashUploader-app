@@ -56,3 +56,4 @@ dashuploader-win32-x64
 .gradle
 .idea
 build
+DashUploaderAndroidApp/app/fabric.properties
