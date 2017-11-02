@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "Resuming activity");
         initializeDiscoveryListener();
         initializeResolveListener();
         mBtnScanDevices.setOnClickListener(new View.OnClickListener() {
@@ -109,11 +110,20 @@ public class MainActivity extends Activity {
     }
 
     private void addDeviceToList(NsdServiceInfo serviceInfo) {
-        AmebaDevice device = new AmebaDevice();
-        device.setDeviceIP(serviceInfo.getHost().getHostAddress());
-        device.setPort(serviceInfo.getPort());
-        device.setDeviceName(serviceInfo.getServiceName());
-        mAmebaDevices.add(device);
+        AmebaDevice device = new AmebaDevice(serviceInfo);
+        if(!isDeviceAlreadyDiscovered(device)){
+            mAmebaDevices.add(device);
+        }
+    }
+
+    private boolean isDeviceAlreadyDiscovered(AmebaDevice aDevice) {
+        for(AmebaDevice device : mAmebaDevices){
+            if(device.getDeviceIP().equalsIgnoreCase(aDevice.getDeviceIP())){
+                Log.d(TAG, "Device already discovered");
+                return true;
+            }
+        }
+        return false;
     }
 
     public void initializeResolveListener() {

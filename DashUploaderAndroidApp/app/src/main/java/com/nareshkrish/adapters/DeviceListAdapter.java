@@ -48,7 +48,7 @@ public class DeviceListAdapter extends BaseAdapter {
            view = inflater.inflate(R.layout.ameba_devices_list_item, null);
            AmebaDevice device = (AmebaDevice) getItem(i);
            ((TextView)view.findViewById(R.id.main_tvDeviceName)).setText("Device Name: " + device.getDeviceName());
-           ((TextView)view.findViewById(R.id.main_tvDevicePort)).setText("Device Name: " + device.getDeviceIP() + ":" + device.getPort());
+           ((TextView)view.findViewById(R.id.main_tvDevicePort)).setText("Device Name: " + device.getDeviceIP() + ":" + device.getDevicePort());
 
        }
        return view;
