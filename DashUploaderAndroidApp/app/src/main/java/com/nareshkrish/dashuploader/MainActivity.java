@@ -2,24 +2,35 @@ package com.nareshkrish.dashuploader;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.nareshkrish.adapters.DeviceListAdapter;
 import com.nareshkrish.ameba.AmebaDevice;
+import com.nareshkrish.service.DeviceOTAResultReceiver;
+import com.nareshkrish.service.OTAUploadService;
 
 import io.fabric.sdk.android.Fabric;
+import utils.DUConstants;
+
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, DeviceOTAResultReceiver.Receiver {
 
     private ListView mLvDiscoveredDevices;
     private Button mBtnScanDevices;
@@ -28,6 +39,7 @@ public class MainActivity extends Activity {
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private NsdManager.ResolveListener mResolveListener;
     private DeviceListAdapter mDeviceListAdapter;
+    private DeviceOTAResultReceiver mDeviceOTAResultReceiver;
 
     private static final String TAG = "MainActivity";
 
@@ -43,6 +55,8 @@ public class MainActivity extends Activity {
 
         mAmebaDevices = new ArrayList<>();
         mDeviceListAdapter = new DeviceListAdapter(mAmebaDevices, this);
+        mLvDiscoveredDevices.setOnItemClickListener(this);
+        mDeviceOTAResultReceiver = new DeviceOTAResultReceiver(new Handler());
     }
 
     @Override
@@ -58,6 +72,7 @@ public class MainActivity extends Activity {
             }
         });
         mLvDiscoveredDevices.setAdapter(mDeviceListAdapter);
+        mDeviceOTAResultReceiver.setReceiver(this);
     }
 
     private void scanDevices() {
@@ -151,5 +166,25 @@ public class MainActivity extends Activity {
             }
         };
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        AmebaDevice device = (AmebaDevice) adapterView.getAdapter().getItem(i);
+        Log.d(TAG, "Device selected" + device.toString());
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<AmebaDevice>() {}.getType();
+        String json = gson.toJson(device, type);
+
+        Intent uploadIntent = new Intent(this, OTAUploadService.class);
+        uploadIntent.putExtra(DUConstants.INTENT_DEVICE_RESULT, mDeviceOTAResultReceiver);
+        uploadIntent.putExtra(DUConstants.OTA_DEVICE_EXTRA, json);
+        startService(uploadIntent);
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        Log.d(TAG,"Received result from Service");
     }
 }

@@ -46,4 +46,9 @@ public class AmebaDevice {
     public String getDeviceName() {
         return deviceName;
     }
+
+    @Override
+    public String toString() {
+        return "Ameba Device: " + this.getDeviceName() + " " + this.getDeviceIP() + ":" + this.getDevicePort() ;
+    }
 }
