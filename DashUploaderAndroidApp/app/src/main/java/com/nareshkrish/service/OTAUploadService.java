@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -41,7 +42,7 @@ public class OTAUploadService extends IntentService {
     private static final int MAX_BUFFER_SIZE = 1024;
     private final String TAG = "OTAUploadService";
     private AmebaDevice mOTADevices;
-    private Socket deviceSocket;
+    //private Socket deviceSocket;
     private int fileChecksum = 0;
 
 
@@ -82,14 +83,14 @@ public class OTAUploadService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(deviceSocket != null) {
+        /*if(deviceSocket != null) {
             try {
                 Log.d(TAG, "Closing device socket.");
                 deviceSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /**
@@ -113,7 +114,7 @@ public class OTAUploadService extends IntentService {
             Log.d(TAG,"File size ::" + fs.available());
             while((nRead = fs.read(buffer, 0, MAX_BUFFER_SIZE)) != -1)
             {
-                System.out.println(new String(buffer));
+                //System.out.println(new String(buffer));
                 total += nRead;
                 fwBytes = concat(fwBytes, buffer);
                 for (int i=0; i<nRead; i++) {
@@ -165,14 +166,22 @@ public class OTAUploadService extends IntentService {
     }
 
     private boolean sendOTAToDevice(AmebaDevice device, byte[] fwBytes, int fwLength, int[] otaDesc) throws IOException{
-        deviceSocket = new Socket(device.getDeviceIP(), device.getDevicePort());
+        Log.d(TAG, "Trying connection to :: " + device.getDeviceIP() + ":" + device.getDevicePort());
+        Socket deviceSocket = new Socket(device.getDeviceIP(), device.getDevicePort());
+
         OutputStream os = deviceSocket.getOutputStream();
+        ObjectOutputStream stream = new ObjectOutputStream(os);
+
         fwBytes = Arrays.copyOf(fwBytes, fwLength);
         Log.i(TAG, "Sending OTA Decsription");
         os.write(integersToBytes(otaDesc), 0, otaDesc.length);
-        Log.i(TAG, "Sending OTA image");
-        os.write(fwBytes, 0, fwLength);
 
+        //commented out for now as i can see garbage value being posted even with just a socket opening
+        //Log.i(TAG, "Sending OTA image");
+        //os.write(fwBytes, 0, fwLength);
+        os.close();
+        stream.close();
+        deviceSocket.close();
         return true;
     }
 
@@ -202,9 +211,21 @@ public class OTAUploadService extends IntentService {
     private byte[] integersToBytes(int[] values) throws IOException{
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataStream = new DataOutputStream(byteOutputStream);
+        byte[] result = new byte[values.length];
         for(int i=0; i<values.length; i++){
             dataStream.writeInt(values[i]);
         }
+
+        byte[] b =  byteOutputStream.toByteArray();
+        return b;
+        writeInts(byteOutputStream, values);
         return byteOutputStream.toByteArray();
+    }
+
+    private static void writeInts(OutputStream out, int[] ints) throws IOException {
+        DataOutputStream dataOut = new DataOutputStream(out);
+        dataOut.writeInt(ints.length);
+        for (int e : ints) dataOut.writeInt(e);
+        dataOut.flush();
     }
 }

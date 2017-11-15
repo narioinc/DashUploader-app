@@ -163,6 +163,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                         mDeviceListAdapter.notifyDataSetChanged();
                     }
                 });
+                mNsdManager.stopServiceDiscovery(mDiscoveryListener);
             }
         };
 
