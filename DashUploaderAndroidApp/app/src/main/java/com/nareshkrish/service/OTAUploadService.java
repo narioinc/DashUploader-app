@@ -26,10 +26,13 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
 import utils.DUConstants;
+import utils.TCPClient;
 
 /**
  * Created by Naresh Krish on 11/11/2017.
@@ -42,7 +45,6 @@ public class OTAUploadService extends IntentService {
     private static final int MAX_BUFFER_SIZE = 1024;
     private final String TAG = "OTAUploadService";
     private AmebaDevice mOTADevices;
-    //private Socket deviceSocket;
     private int fileChecksum = 0;
 
 
@@ -71,7 +73,16 @@ public class OTAUploadService extends IntentService {
             byte[] otaContent = getFileContent(R.raw.ota);
             try {
                 int[] otaDesc = getOTADescription(fileChecksum, getFileSize(R.raw.ota));
-                sendOTAToDevice(mOTADevices, otaContent, otaContent.length, otaDesc);
+                Socket sock = new Socket("192.168.1.13", 5000);
+                OutputStream os = sock.getOutputStream();
+                DataOutputStream stream = new DataOutputStream(os);
+                ByteBuffer buff = ByteBuffer.allocate(12);
+                byte[] b = buff.order(ByteOrder.LITTLE_ENDIAN).putInt(28000452).putInt(0).putInt(276241).array();
+                stream.write(b);
+                stream.write(otaContent, 0, otaContent.length);
+                os.close();
+                stream.close();
+                sock.close();
             }catch(IOException exp){
                 Log.e(TAG, "Error while handling OTA file data: " + exp.getLocalizedMessage());
             }
@@ -83,14 +94,6 @@ public class OTAUploadService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        /*if(deviceSocket != null) {
-            try {
-                Log.d(TAG, "Closing device socket.");
-                deviceSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
     }
 
     /**
@@ -166,22 +169,17 @@ public class OTAUploadService extends IntentService {
     }
 
     private boolean sendOTAToDevice(AmebaDevice device, byte[] fwBytes, int fwLength, int[] otaDesc) throws IOException{
-        Log.d(TAG, "Trying connection to :: " + device.getDeviceIP() + ":" + device.getDevicePort());
-        Socket deviceSocket = new Socket(device.getDeviceIP(), device.getDevicePort());
-
-        OutputStream os = deviceSocket.getOutputStream();
-        ObjectOutputStream stream = new ObjectOutputStream(os);
-
-        fwBytes = Arrays.copyOf(fwBytes, fwLength);
-        Log.i(TAG, "Sending OTA Decsription");
-        os.write(integersToBytes(otaDesc), 0, otaDesc.length);
-
-        //commented out for now as i can see garbage value being posted even with just a socket opening
-        //Log.i(TAG, "Sending OTA image");
-        //os.write(fwBytes, 0, fwLength);
+        Socket sock = new Socket(device.getDeviceIP(), device.getDevicePort());
+        OutputStream os = sock.getOutputStream();
+        DataOutputStream stream = new DataOutputStream(os);
+        ByteBuffer buff = ByteBuffer.allocate(12);
+        byte[] b = buff.order(ByteOrder.LITTLE_ENDIAN).putInt(otaDesc[0]).putInt(0).putInt(otaDesc[2]).array();
+        stream.write(b);
+        stream.write(fwBytes, 0, fwBytes.length);
         os.close();
         stream.close();
-        deviceSocket.close();
+        sock.close();
+
         return true;
     }
 
@@ -218,8 +216,8 @@ public class OTAUploadService extends IntentService {
 
         byte[] b =  byteOutputStream.toByteArray();
         return b;
-        writeInts(byteOutputStream, values);
-        return byteOutputStream.toByteArray();
+        //writeInts(byteOutputStream, values);
+        //return byteOutputStream.toByteArray();
     }
 
     private static void writeInts(OutputStream out, int[] ints) throws IOException {
