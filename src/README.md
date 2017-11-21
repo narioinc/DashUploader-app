@@ -29,6 +29,12 @@ npm install
 npm start
 ```
 
+# Troubleshooting
+
+While opening issues, please do post the logs from the src/logs folder from the project root folder.
+
+If you feel that the IP information needs redacting please do so and then upload the logs :). While doing so, let me know a little bit about the network environment (NAT, PAT, firewalls, virtual LANs etc ) that you may have setup.
+
 # Beta v1.1
 Beta version v1.1 includes the following changes
 * enable/disables the various button based on previous steps success
