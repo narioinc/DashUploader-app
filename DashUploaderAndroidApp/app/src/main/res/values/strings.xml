@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DashUploader</string>
+    <string name="splash_welcomeText">DashUploader</string>
 </resources>

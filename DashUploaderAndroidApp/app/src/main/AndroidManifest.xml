@@ -12,6 +12,10 @@
 
         <service android:name="com.nareshkrish.service.OTAUploadService"></service>
         <activity android:name=".MainActivity">
+        </activity>
+
+        <activity android:name=".SplashActivity"
+            android:theme="@style/Theme.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
